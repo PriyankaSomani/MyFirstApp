@@ -16,7 +16,7 @@ fetch('https://developers.zomato.com/api/v2.1/search?lat=19.1351&lon=72.814&coun
 
 function findMatches(wordToMatch, restaurants) {
 
-    restaurants.filter(restaurant => {
+    return restaurants.filter(restaurant => {
         const regex = new RegExp(wordToMatch, 'gi');
         return restaurant.name.match(regex);
     });
@@ -26,9 +26,27 @@ const searchBox = document.querySelector('.search');
 const suggestions = document.querySelector('.suggestions');
 
 function displayMatches() {
-    const matchArray = findMatches(this.value, restaurants);
-    console.log(matchArray);
+    if(this.value !== '') {
+        const matchArray = findMatches(this.value, restaurants);
+        const html = matchArray.reduce((acc,restaurant) => {
+            return `${acc}<li>${restaurant.name}</li>`;
+        },'');
+        suggestions.innerHTML = html;
+    }
+    else suggestions.innerHTML = '';
 }
 
 searchBox.addEventListener('keyup', displayMatches);
 searchBox.addEventListener('change', displayMatches);
+
+//filter logic
+const filterBox = document.querySelector('.select__filter');
+
+function displayFilteredMatches() {
+    let filteredRestaurents = restaurants.filter(restaurant => {
+        return restaurant.user_rating.aggregate_rating > this.value;
+    });
+    console.log(filteredRestaurents);
+}
+
+filterBox.addEventListener('change', displayFilteredMatches);
